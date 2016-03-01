@@ -1,0 +1,23 @@
+{
+    "name": "sanpi/pg4grafana",
+    "license": "MIT",
+    "description": "Postgresql proxy for grafana",
+    "require": {
+        "php": ">=7.0",
+        "symfony/symfony": "~3.0",
+        "pomm-project/pomm-bundle": "~2.0"
+    },
+    "autoload": {
+        "psr-4": { "AppBundle\\": "src/" },
+        "classmap": [ "app/AppKernel.php" ]
+    },
+    "config": {
+        "bin-dir": "bin"
+    },
+    "extra": {
+        "symfony-app-dir": "app",
+        "symfony-bin-dir": "bin",
+        "symfony-var-dir": "var",
+        "symfony-web-dir": "web"
+    }
+}
