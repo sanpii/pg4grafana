@@ -2,3 +2,7 @@ services:
     index_controller:
         class: AppBundle\Controller\IndexController
         arguments: ['@pomm']
+    cors:
+        class: AppBundle\EventListener\CorsResponseListener
+        tags:
+            - { name: kernel.event_listener, event: kernel.response, method: onKernelResponse }
