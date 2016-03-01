@@ -1,0 +1,19 @@
+imports:
+    - { resource: parameters.yml }
+
+framework:
+    assets: ~
+    secret: "%secret%"
+    router:
+        resource: "%kernel.root_dir%/config/routing.yml"
+    templating:
+        engines: ['twig']
+
+twig:
+    debug: "%kernel.debug%"
+    strict_variables: "%kernel.debug%"
+
+pomm:
+    configuration:
+        default:
+            dsn: 'pgsql://%database_user%:%database_password%@%database_host%:%database_port%/%database_name%'
