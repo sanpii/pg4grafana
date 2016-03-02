@@ -1,7 +1,7 @@
 services:
     index_controller:
         class: AppBundle\Controller\IndexController
-        arguments: ['%database_host%', '%database_port%']
+        arguments: ['%database_host%', '%database_port%', '%time_fields%']
     cors:
         class: AppBundle\EventListener\CorsResponseListener
         tags:

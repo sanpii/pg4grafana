@@ -13,11 +13,16 @@ class IndexController
 {
     private $databaseHost;
     private $databasePort;
+    private $timeFields;
 
-    public function __construct($databaseHost, $databasePort)
-    {
+    public function __construct(
+        string $databaseHost,
+        string $databasePort,
+        array $timeFields
+    ) {
         $this->databaseHost = $databaseHost;
         $this->databasePort = $databasePort;
+        $this->timeFields = $timeFields;
     }
 
     public function queryAction(Request $request): Response
@@ -30,8 +35,10 @@ class IndexController
             ];
         }
         elseif ($queries !== '') {
+            $databaseName = $request->query->get('db');
+
             $pomm = $this->getPomm(
-                $request->query->get('db'),
+                $databaseName,
                 $request->query->get('u'),
                 $request->query->get('p')
             );
@@ -44,12 +51,14 @@ class IndexController
                 ],
             ];
 
+            $timeField = $this->timeFields[$databaseName] ?? 'time';
+
             foreach (explode("\n", $queries) as $query) {
                 if (empty($query)) {
                     continue;
                 }
 
-                $query = $this->transformQuery($query);
+                $query = $this->transformQuery($query, $timeField);
 
                 try {
                     $results = $pomm['default']->getQueryManager()
@@ -97,11 +106,11 @@ class IndexController
         return new Pomm($configuration);
     }
 
-    private function transformQuery(string $query): string
+    private function transformQuery(string $query, string $timeField): string
     {
-        $query = preg_replace('/time ((?:<|>) now\(\))/', 'created $1', $query);
-        $query = preg_replace('/time ((?:<|>) now\(\) -) (\d+\w)/', 'created $1 \'$2\'::interval', $query);
-        $query = preg_replace('/time ((?:<|>) \d+)s/', 'extract(epoch from created) $1', $query);
+        $query = preg_replace('/time ((?:<|>) now\(\) -) (\d+\w)/', "$timeField $1 '$2'::interval", $query);
+        $query = preg_replace('/time ((?:<|>) now\(\))/', "$timeField $1", $query);
+        $query = preg_replace('/time ((?:<|>) \d+)s/', "extract(epoch from $timeField) $1", $query);
         return $query;
     }
 }
