@@ -9,11 +9,13 @@ use \Symfony\Component\HttpFoundation\Request;
 
 class IndexController
 {
-    private $pomm;
+    private $databaseHost;
+    private $databasePort;
 
-    public function __construct(Pomm $pomm)
+    public function __construct($databaseHost, $databasePort)
     {
-        $this->pomm = $pomm;
+        $this->databaseHost = $databaseHost;
+        $this->databasePort = $databasePort;
     }
 
     public function queryAction(Request $request): JsonResponse
@@ -26,6 +28,12 @@ class IndexController
             ];
         }
         elseif ($queries !== '') {
+            $pomm = $this->getPomm(
+                $request->query->get('db'),
+                $request->query->get('u'),
+                $request->query->get('p')
+            );
+
             $response = [
                 'results' => [
                     [
@@ -40,7 +48,7 @@ class IndexController
                 }
 
                 $query = $this->transformQuery($query);
-                $results = $this->pomm['default']->getQueryManager()
+                $results = $pomm['default']->getQueryManager()
                     ->query($query);
 
                 $serie = [
@@ -65,6 +73,17 @@ class IndexController
         }
 
         return new JsonResponse($response);
+    }
+
+    private function getPomm($name, $user, $password)
+    {
+        $configuration = [
+            'default' => [
+                'dsn' => "pgsql://$user:$password@{$this->databaseHost}:{$this->databasePort}/$name",
+            ],
+        ];
+
+        return new Pomm($configuration);
     }
 
     private function transformQuery(string $query): string
