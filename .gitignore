@@ -1,5 +1,5 @@
 /app/config/parameters.yml
-/bin/
+/bin/*
 !bin/console
 /composer.phar
 /composer.lock
