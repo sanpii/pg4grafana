@@ -3,9 +3,11 @@ declare(strict_types = 1);
 
 namespace AppBundle\Controller;
 
+use \PommProject\Foundation\Exception\SqlException;
 use \PommProject\Foundation\Pomm;
 use \Symfony\Component\HttpFoundation\JsonResponse;
 use \Symfony\Component\HttpFoundation\Request;
+use \Symfony\Component\HttpFoundation\Response;
 
 class IndexController
 {
@@ -18,7 +20,7 @@ class IndexController
         $this->databasePort = $databasePort;
     }
 
-    public function queryAction(Request $request): JsonResponse
+    public function queryAction(Request $request): Response
     {
         $queries = $request->query->get('q');
 
@@ -48,24 +50,33 @@ class IndexController
                 }
 
                 $query = $this->transformQuery($query);
-                $results = $pomm['default']->getQueryManager()
-                    ->query($query);
 
-                $serie = [
-                    'name' => md5($query),
-                    'columns' => [],
-                    'values' => [],
-                ];
+                try {
+                    $results = $pomm['default']->getQueryManager()
+                        ->query($query);
 
-                if (count($results) > 0) {
-                    $serie['columns'] = array_keys($results->get(0));
+                    $serie = [
+                        'name' => md5($query),
+                        'columns' => [],
+                        'values' => [],
+                    ];
+
+                    if (count($results) > 0) {
+                        $serie['columns'] = array_keys($results->get(0));
+                    }
+
+                    foreach ($results as $result) {
+                        $serie['values'][] = array_values($result);
+                    }
+
+                    $response['results'][0]['series'][] = $serie;
                 }
-
-                foreach ($results as $result) {
-                    $serie['values'][] = array_values($result);
+                catch (SqlException $e) {
+                    return new Response(
+                        $e->getMessage(),
+                        JsonResponse::HTTP_BAD_REQUEST
+                    );
                 }
-
-                $response['results'][0]['series'][] = $serie;
             }
         }
         else {
