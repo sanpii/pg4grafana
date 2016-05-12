@@ -53,7 +53,7 @@ class IndexController
 
             $timeField = $this->timeFields[$databaseName] ?? 'time';
 
-            foreach (explode("\n", $queries) as $query) {
+            foreach (preg_split("/;|\n/", $queries) as $query) {
                 if (empty($query)) {
                     continue;
                 }
