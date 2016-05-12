@@ -1,4 +1,9 @@
 index:
+    path: /
+    defaults: { _controller: index_controller:indexAction }
+    methods: [GET]
+
+query:
     path: /query
     defaults: { _controller: index_controller:queryAction }
     methods: [GET]

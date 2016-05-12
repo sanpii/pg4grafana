@@ -25,6 +25,11 @@ class IndexController
         $this->timeFields = $timeFields;
     }
 
+    public function indexAction(): Response
+    {
+        return new Response();
+    }
+
     public function queryAction(Request $request): Response
     {
         $queries = $request->query->get('q');
