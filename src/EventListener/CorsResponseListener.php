@@ -12,6 +12,6 @@ class CorsResponseListener
         $headers->set('Access-Control-Allow-Origin', '*');
         $headers->set('Access-Control-Request-Method', '*');
         $headers->set('Access-Control-Allow-Methods', 'OPTIONS, GET');
-        $headers->set('Access-Control-Allow-Headers', '*');
+        $headers->set('Access-Control-Allow-Headers', 'accept, content-type');
     }
 }
