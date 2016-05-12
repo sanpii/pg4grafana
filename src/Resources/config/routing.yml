@@ -3,7 +3,12 @@ index:
     defaults: { _controller: index_controller:indexAction }
     methods: [GET]
 
+options:
+    path: /query
+    defaults: { _controller: index_controller:optionsAction }
+    methods: [OPTIONS]
+
 query:
     path: /query
     defaults: { _controller: index_controller:queryAction }
-    methods: [GET]
+    methods: [POST]

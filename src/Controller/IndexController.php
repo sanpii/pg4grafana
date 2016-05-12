@@ -30,6 +30,11 @@ class IndexController
         return new Response();
     }
 
+    public function optionsAction(): Response
+    {
+        return new Response();
+    }
+
     public function queryAction(Request $request): Response
     {
         $queries = $request->query->get('q');
@@ -39,7 +44,7 @@ class IndexController
                 'results' => [],
             ];
         }
-        elseif ($queries !== '') {
+        elseif (!empty($queries)) {
             $databaseName = $request->query->get('db');
 
             $pomm = $this->getPomm(
