@@ -37,69 +37,59 @@ class IndexController
 
     public function queryAction(Request $request): Response
     {
-        $queries = $request->query->get('q');
+        $data = json_decode($request->getContent());
 
-        if ($queries === 'SHOW MEASUREMENTS LIMIT 1') {
-            $response = [
-                'results' => [],
-            ];
-        }
-        elseif (!empty($queries)) {
-            $databaseName = $request->query->get('db');
+        $databaseName = $request->query->get('db');
 
-            $pomm = $this->getPomm(
-                $databaseName,
-                $request->query->get('u'),
-                $request->query->get('p')
-            );
+        $pomm = $this->getPomm(
+            $databaseName,
+            $request->query->get('u'),
+            $request->query->get('p')
+        );
 
-            $response = [
-                'results' => [
-                    [
-                        'series' => [],
-                    ],
+        $response = [
+            'results' => [
+                [
+                    'series' => [],
                 ],
-            ];
+            ],
+        ];
 
-            $timeField = $this->timeFields[$databaseName] ?? 'time';
+        $timeField = $this->timeFields[$databaseName] ?? 'time';
 
-            foreach (preg_split("/;|\n/", $queries) as $query) {
-                if (empty($query)) {
-                    continue;
-                }
-
-                $query = $this->transformQuery($query, $timeField);
-
-                try {
-                    $results = $pomm['default']->getQueryManager()
-                        ->query($query);
-
-                    $serie = [
-                        'name' => md5($query),
-                        'columns' => [],
-                        'values' => [],
-                    ];
-
-                    if (count($results) > 0) {
-                        $serie['columns'] = array_keys($results->get(0));
-                    }
-
-                    foreach ($results as $result) {
-                        $serie['values'][] = array_values($result);
-                    }
-
-                    $response['results'][0]['series'][] = $serie;
-                }
-                catch (SqlException $e) {
-                    return new Response(
-                        $e->getMessage(),
-                        JsonResponse::HTTP_BAD_REQUEST
-                    );
-                }
+        foreach (preg_split("/;|\n/", $queries) as $query) {
+            if (empty($query)) {
+                continue;
             }
-        }
-        else {
-            $response = 'OK';
+
+            $query = $this->transformQuery($query, $timeField);
+
+            try {
+                $results = $pomm['default']->getQueryManager()
+                    ->query($query);
+
+                $serie = [
+                    'name' => md5($query),
+                    'columns' => [],
+                    'values' => [],
+                ];
+
+                if (count($results) > 0) {
+                    $serie['columns'] = array_keys($results->get(0));
+                }
+
+                foreach ($results as $result) {
+                    $serie['values'][] = array_values($result);
+                }
+
+                $response['results'][0]['series'][] = $serie;
+            }
+            catch (SqlException $e) {
+                return new Response(
+                    $e->getMessage(),
+                    JsonResponse::HTTP_BAD_REQUEST
+                );
+            }
         }
 
         return new JsonResponse($response);
