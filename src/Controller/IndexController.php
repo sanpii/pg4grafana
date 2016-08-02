@@ -14,15 +14,18 @@ class IndexController
     private $databaseHost;
     private $databasePort;
     private $timeFields;
+    private $pomm;
 
     public function __construct(
         string $databaseHost,
         string $databasePort,
-        array $timeFields
+        array $timeFields,
+        Pomm $pomm
     ) {
         $this->databaseHost = $databaseHost;
         $this->databasePort = $databasePort;
         $this->timeFields = $timeFields;
+        $this->pomm = $pomm;
     }
 
     public function indexAction(): Response
@@ -30,9 +33,37 @@ class IndexController
         return new Response();
     }
 
-    public function optionsAction(): Response
+    public function optionsAction(string $database): Response
     {
         return new Response();
+    }
+
+    public function searchAction(string $database, Request $request): Response
+    {
+        $params = json_decode($request->getContent());
+
+        $timeField = $this->timeFields[$database] ?? 'time';
+        $query = $this->transformQuery($params->target, $timeField);
+
+        try {
+            $results = $this->pomm[$database]->getQueryManager()
+                ->query($query);
+
+            $response = [
+                'target' => $params->target,
+                'datapoints' => $results->extract(),
+            ];
+
+            $response = new JsonResponse($response);
+        }
+        catch (SqlException $e) {
+            $response = new Response(
+                $e->getMessage(),
+                JsonResponse::HTTP_BAD_REQUEST
+            );
+        }
+
+        return $response;
     }
 
     public function queryAction(Request $request): Response

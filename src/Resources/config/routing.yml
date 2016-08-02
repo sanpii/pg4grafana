@@ -1,12 +1,17 @@
 get_index:
-    path: /
+    path: /{database}/
     defaults: { _controller: index_controller:indexAction }
     methods: [GET]
 
 options_search:
-    path: /search
+    path: /{database}/search
     defaults: { _controller: index_controller:optionsAction }
     methods: [OPTIONS]
+
+post_search:
+    path: /{database}/search
+    defaults: { _controller: index_controller:searchAction }
+    methods: [POST]
 
 options_query:
     path: /query
