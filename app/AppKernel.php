@@ -2,10 +2,7 @@
 declare(strict_types = 1);
 
 use \Symfony\Component\Config\Loader\LoaderInterface;
-use \Symfony\Component\DependencyInjection\ContainerBuilder;
 use \Symfony\Component\HttpKernel\Kernel;
-use \Symfony\Component\Routing\RouteCollectionBuilder;
-use Symfony\Component\HttpFoundation\JsonResponse;
 
 class AppKernel extends Kernel
 {
