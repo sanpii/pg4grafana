@@ -111,6 +111,7 @@ class IndexController
         $query = preg_replace('/time ((?:<|>) now\(\) -) (\d+\w)/', "$timeField $1 '$2'::interval", $query);
         $query = preg_replace('/time ((?:<|>) now\(\))/', "$timeField $1", $query);
         $query = preg_replace('/time (<|>) (\d+)s/', "$timeField $1 to_timestamp($2)", $query);
+        $query = preg_replace('/time (<|>) (\d+)ms/', "$timeField $1 to_timestamp($2/1000)", $query);
         return $query;
     }
 }
