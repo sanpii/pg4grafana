@@ -1,5 +1,6 @@
 BOWER_FLAGS=
-COMPOSER_FLAGS=-n
+COMPOSER_FLAGS=--no-interaction
+SYMFONY_FLAGS=--no-interaction
 
 ifeq ($(APP_ENVIRONMENT),prod)
 	BOWER_FLAGS+=--production
@@ -27,15 +28,15 @@ composer.lock: composer.json
 	composer install $(COMPOSER_FLAGS)
 
 assets: src/Resources/public/lib
-	bin/console cache:clear
-	bin/console assets:install --symlink --relative web
-	bin/console assetic:dump
+	bin/console cache:clear $(SYMFONY_FLAGS)
+	bin/console assets:install $(SYMFONY_FLAGS) --symlink --relative web
+	bin/console assetic:dump $(SYMFONY_FLAGS)
 
 src/Resources/public/lib: bower.json
 	bower install $(BOWER_FLAGS)
 
 cache:
-	bin/console cache:warmup --env=$(APP_ENVIRONMENT) --no-interaction
+	bin/console cache:warmup $(SYMFONY_FLAGS)
 
 distclean:
 	rm -rf vendor composer.lock src/Resources/public/lib
